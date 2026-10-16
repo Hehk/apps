@@ -1,0 +1,19 @@
+{
+  "$schema": "node_modules/wrangler/config-schema.json",
+  "name": "inoread-apps-api",
+  "main": "src/index.ts",
+  "compatibility_date": "2025-03-01",
+  "workers_dev": false,
+  "routes": [{ "pattern": "*.inoread.com/api/*", "zone_name": "inoread.com" }],
+  "d1_databases": [
+    {
+      "binding": "DB",
+      "database_name": "inoread-apps",
+      "database_id": "REPLACE_WITH_D1_DATABASE_ID",
+    },
+  ],
+  "vars": {
+    "ACCESS_ISSUER": "https://REPLACE_WITH_TEAM.cloudflareaccess.com",
+    "ACCESS_AUD": "REPLACE_WITH_ACCESS_APPLICATION_AUD",
+  },
+}
