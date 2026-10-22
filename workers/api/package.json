@@ -13,6 +13,7 @@
   },
   "devDependencies": {
     "@cloudflare/workers-types": "latest",
+    "@total-typescript/ts-reset": "^0.6.1",
     "typescript": "latest",
     "wrangler": "latest"
   }

@@ -10,7 +10,7 @@ const jwksByIssuer = new Map<string, ReturnType<typeof createRemoteJWKSet>>();
 
 function getJwks(issuer: string) {
   let jwks = jwksByIssuer.get(issuer);
-  if (!jwks) {
+  if (jwks == null) {
     jwks = createRemoteJWKSet(new URL(`${issuer}/cdn-cgi/access/certs`));
     jwksByIssuer.set(issuer, jwks);
   }
@@ -19,14 +19,19 @@ function getJwks(issuer: string) {
 
 async function getUserId(request: Request, env: Env): Promise<string | null> {
   const token = request.headers.get("cf-access-jwt-assertion");
-  if (!token || !env.ACCESS_ISSUER || !env.ACCESS_AUD) return null;
+  if (token == null || token === "" || env.ACCESS_ISSUER === "" || env.ACCESS_AUD === "") {
+    return null;
+  }
 
   try {
     const { payload } = await jwtVerify(token, getJwks(env.ACCESS_ISSUER), {
       issuer: env.ACCESS_ISSUER,
       audience: env.ACCESS_AUD,
     });
-    return typeof payload.sub === "string" ? payload.sub : null;
+    if (typeof payload.sub === "string") {
+      return payload.sub;
+    }
+    return null;
   } catch {
     return null;
   }
@@ -39,14 +44,22 @@ function json(data: unknown, status = 200): Response {
 export default {
   async fetch(request: Request, env: Env): Promise<Response> {
     const url = new URL(request.url);
-    if (url.pathname === "/api/health") return json({ ok: true });
-    if (!url.pathname.startsWith("/api/data/")) return json({ error: "Not found" }, 404);
+    if (url.pathname === "/api/health") {
+      return json({ ok: true });
+    }
+    if (!url.pathname.startsWith("/api/data/")) {
+      return json({ error: "Not found" }, 404);
+    }
 
     const userId = await getUserId(request, env);
-    if (!userId) return json({ error: "Unauthorized" }, 401);
+    if (userId == null || userId === "") {
+      return json({ error: "Unauthorized" }, 401);
+    }
 
     const key = decodeURIComponent(url.pathname.slice("/api/data/".length));
-    if (!key || key.includes("/")) return json({ error: "Invalid key" }, 400);
+    if (key === "" || key.includes("/")) {
+      return json({ error: "Invalid key" }, 400);
+    }
 
     if (request.method === "GET") {
       const row = await env.DB.prepare(
@@ -65,7 +78,7 @@ export default {
         return json({ error: "Invalid JSON" }, 400);
       }
       if (
-        !body ||
+        body == null ||
         typeof body !== "object" ||
         !("value" in body) ||
         typeof body.value !== "string"

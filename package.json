@@ -2,17 +2,19 @@
   "name": "inoread-apps",
   "private": true,
   "scripts": {
-    "dev": "pnpm --parallel --filter @inoread/starter --filter @inoread/api dev",
-    "build": "pnpm --filter @inoread/starter build && pnpm --filter @inoread/api check",
-    "typecheck": "pnpm --filter @inoread/starter typecheck && pnpm --filter @inoread/api check",
+    "dev": "pnpm --parallel --filter @inoread/starter --filter @inoread/timer --filter @inoread/api dev",
+    "build": "pnpm --filter @inoread/starter build && pnpm --filter @inoread/timer build && pnpm --filter @inoread/api check",
+    "typecheck": "pnpm --filter @inoread/starter typecheck && pnpm --filter @inoread/timer typecheck && pnpm --filter @inoread/api check",
     "lint": "oxlint .",
     "format": "oxfmt .",
     "format:check": "oxfmt --check .",
-    "check": "pnpm typecheck && pnpm lint && pnpm format:check"
+    "test": "pnpm --filter @inoread/timer test",
+    "check": "pnpm typecheck && pnpm lint && pnpm format:check && pnpm test"
   },
   "devDependencies": {
     "oxfmt": "^0.72.0",
-    "oxlint": "^1.87.0"
+    "oxlint": "^1.87.0",
+    "oxlint-tsgolint": "^7.0.2004"
   },
   "packageManager": "pnpm@12.4.2"
 }
