@@ -66,7 +66,34 @@ describe("session and mounted subscriptions", () => {
     expect(app.getByRole("button", { name: "Start" })).toBeDefined();
     fireEvent.click(app.getByRole("link", { name: "Edit" }));
     expect(app.getByRole("button", { name: "Continue" })).toBeDefined();
-    expect(app.getByRole("button", { name: "Test sound" })).toBeDefined();
+    expect(app.queryByRole("button", { name: "Test sound" })).toBeNull();
+  });
+
+  it("offers sound recovery above the controls after an audio failure without restarting the timer", async ({
+    onTestFinished,
+  }) => {
+    const app = mount();
+    onTestFinished(app.dispose);
+    expect(app.queryByRole("button", { name: "Enable sound" })).toBeNull();
+    app.dispatch(start);
+    app.environment.handlers.audio = () => ({ ok: false, error: "Sound is suspended" });
+    await app.advanceBy(2000);
+    const before = app.session.runtime.getModel();
+    const enable = app.getByRole("button", { name: "Enable sound" });
+    const pauseButton = app.getByRole("button", { name: "Pause" });
+    expect(enable.compareDocumentPosition(pauseButton) & Node.DOCUMENT_POSITION_FOLLOWING).not.toBe(
+      0,
+    );
+    fireEvent.click(enable);
+    expect(app.getByRole("button", { name: "Enable sound" })).toBeDefined();
+    app.environment.handlers.audio = () => ({ ok: true });
+    fireEvent.click(app.getByRole("button", { name: "Enable sound" }));
+    expect(app.queryByRole("button", { name: "Enable sound" })).toBeNull();
+    expect(app.queryByRole("alert")).toBeNull();
+    expect(app.session.runtime.getModel()).toMatchObject({
+      clockId: before.clockId,
+      route: { model: { status: "running", completed: 1, remainingMs: 2000 } },
+    });
   });
 
   it("creates a session without connecting subscriptions or changing document metadata", () => {

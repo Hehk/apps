@@ -100,6 +100,9 @@ function TimerView({
         <time aria-live="off">{formatTime(model.remainingMs)}</time>
         <output aria-live="polite">{interval}</output>
       </div>
+      {model.soundError !== null && (
+        <button onClick={() => dispatch({ kind: "testSound" })}>Enable sound</button>
+      )}
       <div className="controls">
         <button
           disabled={complete}
@@ -131,9 +134,6 @@ export function View({ model, dispatch }: { model: Model; dispatch: Dispatch }) 
       {model.route.kind === "timer" && (
         <TimerView model={model.route.model} config={model.config} dispatch={dispatch} />
       )}
-      <footer>
-        <button onClick={() => dispatch({ kind: "testSound" })}>Test sound</button>
-      </footer>
     </main>
   );
 }

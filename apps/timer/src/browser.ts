@@ -13,13 +13,21 @@ export function createBrowserEnvironment(): Environment {
     now: () => Date.now(),
     audio: ({ operation }, signal) => {
       try {
+        if (operation === "unlock") {
+          const { audioSession } = navigator as Navigator & {
+            audioSession?: { type: string };
+          };
+          if (audioSession != null) {
+            audioSession.type = "playback";
+          }
+        }
         context ??= new AudioContext();
         const audio = context;
         if (operation === "unlock") {
           // Keep this synchronous with the Start click to preserve the user gesture.
           return new Promise<Outcome>((resolve) => {
             const timeout = window.setTimeout(
-              () => resolve(failure("Sound could not start. Tap Test sound to retry.")),
+              () => resolve(failure("Sound could not start. Tap Enable sound to retry.")),
               3000,
             );
             void audio.resume().then(
@@ -27,6 +35,10 @@ export function createBrowserEnvironment(): Environment {
                 window.clearTimeout(timeout);
                 if (signal.aborted) {
                   resolve(failure("Cancelled"));
+                  return;
+                }
+                if (audio.state !== "running") {
+                  resolve(failure("Sound is suspended. Tap Enable sound to retry."));
                   return;
                 }
                 resolve({ ok: true });
@@ -39,7 +51,7 @@ export function createBrowserEnvironment(): Environment {
           });
         }
         if (audio.state !== "running") {
-          return failure("Sound is suspended. Tap Test sound to enable it.");
+          return failure("Sound is suspended. Tap Enable sound to retry.");
         }
         const oscillator = audio.createOscillator();
         const gain = audio.createGain();

@@ -17,8 +17,8 @@ main {
   height: 100dvh;
   max-width: 480px;
   margin: auto;
-  padding: max(12px, env(safe-area-inset-top)) max(16px, env(safe-area-inset-right))
-    max(12px, env(safe-area-inset-bottom)) max(16px, env(safe-area-inset-left));
+  padding: calc(16px + env(safe-area-inset-top)) calc(16px + env(safe-area-inset-right))
+    calc(32px + env(safe-area-inset-bottom)) calc(16px + env(safe-area-inset-left));
   display: flex;
   flex-direction: column;
   gap: 12px;
@@ -106,8 +106,4 @@ time {
 p[role="alert"] {
   margin: 0;
   font-size: 14px;
-}
-
-footer button {
-  width: 100%;
 }
