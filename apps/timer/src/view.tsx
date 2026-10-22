@@ -1,3 +1,4 @@
+import * as stylex from "@stylexjs/stylex";
 import { pageTitle } from "./domain";
 import type { Config, Model, SetupModel, TimerModel } from "./model";
 import { formatTime } from "./model";
@@ -9,19 +10,24 @@ function Warning({ message }: { message: string | null }) {
   if (message == null || message === "") {
     return null;
   }
-  return <p role="alert">{message}</p>;
+  return (
+    <p {...stylex.props(styles.warning)} role="alert">
+      {message}
+    </p>
+  );
 }
 
 function SetupView({ model, dispatch }: { model: SetupModel; dispatch: Dispatch }) {
   return (
-    <section aria-label="Setup">
+    <section {...stylex.props(styles.section)} aria-label="Setup">
       <form
+        {...stylex.props(styles.form)}
         onSubmit={(event) => {
           event.preventDefault();
           dispatch({ kind: "home", action: { kind: "submit" } });
         }}
       >
-        <div className="fields">
+        <div {...stylex.props(styles.fields)}>
           {(
             [
               ["minutes", "Minutes", 0, 180],
@@ -29,9 +35,10 @@ function SetupView({ model, dispatch }: { model: SetupModel; dispatch: Dispatch 
               ["rounds", "Intervals", 1, 999],
             ] as const
           ).map(([field, label, min, max]) => (
-            <label key={field}>
+            <label {...stylex.props(styles.label)} key={field}>
               {label}
               <input
+                {...stylex.props(styles.field, styles.input)}
                 type="number"
                 inputMode="numeric"
                 min={min}
@@ -50,7 +57,9 @@ function SetupView({ model, dispatch }: { model: SetupModel; dispatch: Dispatch 
           ))}
         </div>
         <Warning message={model.error} />
-        <button type="submit">Continue</button>
+        <button {...stylex.props(styles.field, styles.button)} type="submit">
+          Continue
+        </button>
       </form>
       <Warning message={model.soundError} />
     </section>
@@ -81,12 +90,13 @@ function TimerView({
     interval = "Done";
   }
   return (
-    <section aria-label="Interval timer">
-      <header>
+    <section {...stylex.props(styles.section)} aria-label="Interval timer">
+      <header {...stylex.props(styles.row)}>
         <span>
           {formatTime(config.intervalMs)} × {config.rounds}
         </span>
         <a
+          {...stylex.props(styles.link)}
           href="/"
           onClick={(event) => {
             event.preventDefault();
@@ -96,15 +106,23 @@ function TimerView({
           Edit
         </a>
       </header>
-      <div className="countdown">
-        <time aria-live="off">{formatTime(model.remainingMs)}</time>
+      <div {...stylex.props(styles.countdown)}>
+        <time {...stylex.props(styles.time)} aria-live="off">
+          {formatTime(model.remainingMs)}
+        </time>
         <output aria-live="polite">{interval}</output>
       </div>
       {model.soundError !== null && (
-        <button onClick={() => dispatch({ kind: "testSound" })}>Enable sound</button>
-      )}
-      <div className="controls">
         <button
+          {...stylex.props(styles.field, styles.button)}
+          onClick={() => dispatch({ kind: "testSound" })}
+        >
+          Enable sound
+        </button>
+      )}
+      <div {...stylex.props(styles.row)}>
+        <button
+          {...stylex.props(styles.field, styles.button, styles.control)}
           disabled={complete}
           onClick={() => {
             if (running) {
@@ -116,7 +134,10 @@ function TimerView({
         >
           {startButtonLabels[model.status]}
         </button>
-        <button onClick={() => dispatch({ kind: "timer", action: { kind: "reset" } })}>
+        <button
+          {...stylex.props(styles.field, styles.button, styles.control)}
+          onClick={() => dispatch({ kind: "timer", action: { kind: "reset" } })}
+        >
           Reset
         </button>
       </div>
@@ -126,9 +147,97 @@ function TimerView({
   );
 }
 
+const styles = stylex.create({
+  main: {
+    boxSizing: "border-box",
+    height: "100dvh",
+    maxWidth: 480,
+    margin: "auto",
+    paddingTop: "calc(16px + env(safe-area-inset-top))",
+    paddingRight: "calc(16px + env(safe-area-inset-right))",
+    paddingBottom: "calc(32px + env(safe-area-inset-bottom))",
+    paddingLeft: "calc(16px + env(safe-area-inset-left))",
+    display: "flex",
+    flexDirection: "column",
+    gap: 12,
+  },
+  section: {
+    flex: 1,
+    minHeight: 0,
+    display: "flex",
+    flexDirection: "column",
+    justifyContent: "center",
+    gap: 16,
+  },
+  form: {
+    display: "grid",
+    gap: 24,
+  },
+  fields: {
+    display: "grid",
+    gridTemplateColumns: "repeat(3, minmax(0, 1fr))",
+    gap: 8,
+  },
+  label: {
+    display: "grid",
+    gap: 8,
+  },
+  field: {
+    boxSizing: "border-box",
+    font: "inherit",
+    color: "#000",
+    backgroundColor: "#fff",
+    borderWidth: 1,
+    borderStyle: "solid",
+    borderColor: "#000",
+    borderRadius: 0,
+    minHeight: 48,
+    padding: 8,
+  },
+  input: {
+    width: "100%",
+    minWidth: 0,
+    fontSize: 24,
+  },
+  button: {
+    borderStyle: { default: "solid", ":disabled": "dashed" },
+  },
+  control: {
+    flex: 1,
+  },
+  link: {
+    color: "inherit",
+    padding: 12,
+  },
+  row: {
+    display: "flex",
+    alignItems: "center",
+    justifyContent: "space-between",
+    gap: 12,
+  },
+  countdown: {
+    flex: 1,
+    minHeight: 0,
+    display: "flex",
+    flexDirection: "column",
+    alignItems: "center",
+    justifyContent: "center",
+    gap: 12,
+  },
+  time: {
+    fontSize: "min(20vw, 20dvh, 96px)",
+    fontVariantNumeric: "tabular-nums",
+    lineHeight: 1,
+  },
+  warning: {
+    margin: 0,
+    fontSize: 14,
+  },
+});
+
 export function View({ model, dispatch }: { model: Model; dispatch: Dispatch }) {
   return (
-    <main>
+    <main {...stylex.props(styles.main)}>
       <title>{pageTitle(model)}</title>
       {model.route.kind === "home" && <SetupView model={model.route.model} dispatch={dispatch} />}
       {model.route.kind === "timer" && (

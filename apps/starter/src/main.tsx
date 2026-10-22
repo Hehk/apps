@@ -1,7 +1,6 @@
 import React from "react";
 import * as stylex from "@stylexjs/stylex";
 import { createRoot } from "react-dom/client";
-import "./style.css";
 
 function App() {
   const [value, setValue] = React.useState("");
@@ -76,6 +75,18 @@ function App() {
 }
 
 const styles = stylex.create({
+  document: {
+    fontFamily:
+      'ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif',
+    color: "#20231f",
+    backgroundColor: "#f7f7f5",
+    fontSynthesis: "none",
+    textRendering: "optimizeLegibility",
+  },
+  body: {
+    margin: 0,
+    minWidth: 320,
+  },
   main: {
     width: "min(100% - 32px, 560px)",
     margin: "12vh auto 0",
@@ -102,6 +113,7 @@ const styles = stylex.create({
     marginBottom: 10,
   },
   textarea: {
+    boxSizing: "border-box",
     display: "block",
     width: "100%",
     minHeight: 160,
@@ -114,6 +126,7 @@ const styles = stylex.create({
     resize: "vertical",
   },
   button: {
+    boxSizing: "border-box",
     marginTop: 14,
     borderWidth: 0,
     borderRadius: 10,
@@ -130,6 +143,9 @@ const styles = stylex.create({
     fontSize: "0.9rem",
   },
 });
+
+Object.assign(document.documentElement, stylex.props(styles.document));
+Object.assign(document.body, stylex.props(styles.body));
 
 const root = document.getElementById("root");
 if (root == null) {

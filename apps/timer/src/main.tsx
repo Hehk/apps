@@ -1,9 +1,24 @@
+import * as stylex from "@stylexjs/stylex";
 import { createRoot } from "react-dom/client";
 import { App } from "./app";
 import { createSession } from "./session";
 import { createBrowserEnvironment } from "./browser";
 import { initialModel } from "./model";
-import "./style.css";
+
+const styles = stylex.create({
+  document: {
+    fontFamily: "system-ui, sans-serif",
+    color: "#000",
+    backgroundColor: "#fff",
+    colorScheme: "light",
+  },
+  body: {
+    margin: 0,
+  },
+});
+
+Object.assign(document.documentElement, stylex.props(styles.document));
+Object.assign(document.body, stylex.props(styles.body));
 
 const environment = createBrowserEnvironment();
 const session = createSession(initialModel(environment.pathname), environment);

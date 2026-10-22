@@ -8,7 +8,17 @@ export default defineConfig(({ mode }) => {
     return { plugins: [stylexForTests(), react()] };
   }
   return {
-    plugins: [stylex(), react()],
+    plugins: [
+      stylex(),
+      react(),
+      {
+        name: "stylex-fallback-stylesheet",
+        apply: "build",
+        transformIndexHtml() {
+          return [{ tag: "link", attrs: { rel: "stylesheet", href: "/assets/stylex.css" } }];
+        },
+      },
+    ],
     server: {
       host: "0.0.0.0",
       port: 5174,
