@@ -18,7 +18,7 @@ export function createBrowserEnvironment(): Environment {
             audioSession?: { type: string };
           };
           if (audioSession != null) {
-            audioSession.type = "playback";
+            audioSession.type = "ambient";
           }
         }
         context ??= new AudioContext();

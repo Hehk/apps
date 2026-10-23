@@ -25,7 +25,7 @@ it.each([true, false])("unlocks audio with Audio Session support: %s", async (su
       close = close;
       constructor() {
         if (supported) {
-          expect(audioSession.type).toBe("playback");
+          expect(audioSession.type).toBe("ambient");
         }
       }
     },
